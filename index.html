@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MUHAHAH Robot</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="wrap nav-row">
+    <div class="brand"><span class="dot"></span>MUHAHAH</div>
+    <div class="navlinks">
+      <a href="#gioi-thieu">Giới thiệu</a>
+      <a href="#tinh-nang">Tính năng</a>
+      <a href="#tim-duong">Tìm đường</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap" id="gioi-thieu">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">Robot giao hàng tự hành</p>
+      <h1>MUHAHAH giao hàng,<br>bạn khỏi phải đi.</h1>
+      <p class="lede">MUHAHAH là robot giao hàng trong tòa nhà: nhận hàng tại một điểm, tự vẽ bản đồ và chọn đường đi ngắn nhất đến phòng/khu vực nhận, tự né vật cản trên đường. Phần lõi điều hướng chạy thuật toán A* bằng Python ngay trong trình duyệt — bạn có thể thử trực tiếp ở mục "Tìm đường".</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#tim-duong">Thử thuật toán tìm đường</a>
+        <a class="btn btn-ghost" href="#tinh-nang">Khám phá tính năng →</a>
+      </div>
+      <div class="stat-strip">
+        <div class="stat"><b>A*</b><span>thuật toán điều hướng</span></div>
+        <div class="stat"><b>10</b><span>điểm giao / lượt chạy</span></div>
+        <div class="stat"><b>15kg</b><span>tải trọng tối đa</span></div>
+      </div>
+    </div>
+    <div class="rig">
+      <svg viewBox="-96 0 392 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sơ đồ robot MUHAHAH: camera, cảm biến, loa, khoang hàng, tay gạt, bánh di chuyển">
+        <circle cx="100" cy="54" r="30" stroke="var(--fg)" stroke-width="3"/>
+        <circle cx="90" cy="50" r="4.5" fill="var(--accent)"/>
+        <circle cx="110" cy="50" r="4.5" fill="var(--accent)"/>
+        <path d="M88 64 Q100 71 112 64" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="52" y="92" width="96" height="70" rx="14" stroke="var(--fg)" stroke-width="3"/>
+        <line x1="100" y1="84" x2="100" y2="92" stroke="var(--fg)" stroke-width="3"/>
+        <circle cx="100" cy="78" r="4" fill="var(--accent)"/>
+        <rect x="64" y="104" width="72" height="42" rx="6" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <line x1="64" y1="125" x2="136" y2="125" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="36" y1="104" x2="52" y2="116" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="164" y1="104" x2="148" y2="116" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="66" y="168" width="24" height="14" rx="4" stroke="var(--fg)" stroke-width="2.5"/>
+        <rect x="110" y="168" width="24" height="14" rx="4" stroke="var(--fg)" stroke-width="2.5"/>
+        <path d="M18 182 h26 M50 182 h18 M150 182 h18 M176 182 h22" stroke="var(--line)" stroke-width="3"/>
+        <g class="chu-thich"><line x1="116" y1="46" x2="172" y2="30"/><circle cx="116" cy="46" r="2.5"/><text x="176" y="28" text-anchor="start"><tspan class="t1" x="176">Camera</tspan><tspan x="176" dy="11">nhìn đường, né vật cản</tspan></text></g>
+        <g class="chu-thich"><line x1="104" y1="78" x2="172" y2="70"/><circle cx="104" cy="78" r="2.5"/><text x="176" y="68" text-anchor="start"><tspan class="t1" x="176">Cảm biến</tspan><tspan x="176" dy="11">quét bản đồ xung quanh</tspan></text></g>
+        <g class="chu-thich"><line x1="136" y1="125" x2="172" y2="118"/><circle cx="136" cy="125" r="2.5"/><text x="176" y="116" text-anchor="start"><tspan class="t1" x="176">Khoang hàng</tspan><tspan x="176" dy="11">khóa mã, mở bằng OTP</tspan></text></g>
+        <g class="chu-thich"><line x1="38" y1="107" x2="6" y2="96"/><circle cx="38" cy="107" r="2.5"/><text x="2" y="94" text-anchor="end"><tspan class="t1" x="2">Tay gạt</tspan><tspan x="2" dy="11">giữ thăng bằng</tspan></text></g>
+        <g class="chu-thich"><line x1="88" y1="66" x2="6" y2="58"/><circle cx="88" cy="66" r="2.5"/><text x="2" y="56" text-anchor="end"><tspan class="t1" x="2">Loa</tspan><tspan x="2" dy="11">báo người nhận</tspan></text></g>
+        <g class="chu-thich"><line x1="70" y1="176" x2="6" y2="166"/><circle cx="70" cy="176" r="2.5"/><text x="2" y="164" text-anchor="end"><tspan class="t1" x="2">Bánh / chân</tspan><tspan x="2" dy="11">di chuyển, leo bậc</tspan></text></g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Vấn đề thực tế</p>
+      <h2>Giao hàng trong tòa nhà tốn người, tốn thời gian chờ.</h2>
+    </div>
+    <div class="ps-grid">
+      <div class="ps-card bad">
+        <span class="tag">Hiện trạng</span>
+        <h3 style="margin-top:12px">Không có MUHAHAH</h3>
+        <ul>
+          <li>Nhân viên tự đi từng phòng, mỗi lượt chỉ giao được vài điểm</li>
+          <li>Chờ thang máy, tránh người qua lại làm chậm tiến độ</li>
+          <li>Không biết đường tắt khi hành lang bị chặn tạm thời</li>
+          <li>Khó theo dõi món nào đã giao, món nào còn tồn</li>
+        </ul>
+      </div>
+      <div class="ps-card good">
+        <span class="tag good">Với MUHAHAH</span>
+        <h3 style="margin-top:12px">Robot tự tính đường, tự giao</h3>
+        <ul>
+          <li>Thuật toán A* tính đường ngắn nhất qua bản đồ tầng theo thời gian thực</li>
+          <li>Phát hiện vật cản mới, tính lại tuyến đường ngay lập tức</li>
+          <li>Ghép nhiều điểm giao trong một lượt chạy, tối ưu thứ tự</li>
+          <li>App theo dõi trạng thái từng đơn: đang đi / đã giao / trễ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="tinh-nang">
+  <div class="section-head">
+    <p class="eyebrow">Tính năng chính</p>
+    <h2>Mọi thứ cần để giao hàng tự động, an toàn.</h2>
+  </div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 12h16M4 12l5-5M4 12l5 5"/><circle cx="18" cy="12" r="2"/></svg></div>
+      <h3>Tìm đường tối ưu (A*)</h3>
+      <p>Tính đường ngắn nhất trên bản đồ lưới của tầng, cập nhật lại khi gặp vật cản mới.</p>
+    </div>
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+      <h3>Giao nhiều điểm / lượt</h3>
+      <p>Ghép tối đa 10 điểm giao trong một lượt chạy, tự sắp thứ tự để đi ngắn nhất.</p>
+    </div>
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></svg></div>
+      <h3>Né vật cản động</h3>
+      <p>LIDAR phát hiện người/đồ vật mới xuất hiện và tính lại tuyến đường trong &lt;1 giây.</p>
+    </div>
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M5 10h2M17 10h2M7 7l1.5 1.5M17 7l-1.5 1.5"/><rect x="9" y="10" width="6" height="4" rx="1"/></svg></div>
+      <h3>Gọi thang máy tự động</h3>
+      <p>Kết nối API thang máy, tự gọi và chọn tầng khi lộ trình cần đổi tầng.</p>
+    </div>
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16"/><circle cx="12" cy="14" r="2"/></svg></div>
+      <h3>Khoang khóa mã</h3>
+      <p>3 khoang chia nhiệt độ riêng, mở bằng mã OTP gửi tới người nhận.</p>
+    </div>
+    <div class="feat">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0Z"/><path d="M12 8v4l3 2"/></svg></div>
+      <h3>Theo dõi trực tiếp</h3>
+      <p>Người nhận và lễ tân xem vị trí robot và thời gian dự kiến giao trên app.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="tim-duong">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Lõi điều hướng · chạy bằng Python</p>
+      <h2>Xem thuật toán A* tự tìm đường cho MUHAHAH.</h2>
+      <p>Ô lưới dưới đây mô phỏng một tầng nhà: ô xanh lá là điểm xuất phát (kho đồ), ô cam là điểm giao hàng, ô xám là tường/vật cản. Chọn một bản đồ mẫu (có cả thành phố lớn tới 500×500) hoặc tạo thành phố ngẫu nhiên, bấm/kéo trên lưới để sửa, hoặc tự gõ bản đồ bằng số 0 và 1, rồi bấm "Tìm đường". Python (file astar.py, chạy qua Brython) thực hiện thuật toán A*: các ô xanh nhạt là những ô thuật toán đã xét, sau đó robot chạy theo tuyến ngắn nhất với vật lý thật: tăng tốc, phanh trước khúc cua, tốc độ tối đa do bạn chọn (10–40 ô/giây).</p>
+    </div>
+    <div class="path-card">
+      <div class="path-controls">
+        <div class="preset-row" id="preset-row"><span class="lbl">Bản đồ mẫu</span></div>
+          <div class="city-row">
+            <span class="lbl">Thành phố ngẫu nhiên</span>
+            <select id="city-size" aria-label="Kích thước thành phố">
+              <option value="40">40×40</option>
+              <option value="60">60×60</option>
+              <option value="80">80×80</option>
+              <option value="100" selected>100×100</option>
+              <option value="120">120×120</option>
+              <option value="150">150×150</option>
+              <option value="200">200×200</option>
+              <option value="300">300×300</option>
+              <option value="500">500×500</option>
+            </select>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-city">🎲 Tạo thành phố</button>
+          </div>
+          <div class="gt-row">
+            <label class="gt-bat"><input type="checkbox" id="gt-bat" checked> 🚗 Xe cộ, người đi bộ, đèn giao thông</label>
+            <span class="gt-info mono" id="gt-info"></span>
+          </div>
+        <div class="mode-row">
+          <button type="button" class="mode-btn active" id="mode-wall" data-mode="wall">✏️ Vẽ vật cản</button>
+          <button type="button" class="mode-btn" id="mode-start" data-mode="start">🟢 Đặt xuất phát</button>
+          <button type="button" class="mode-btn" id="mode-goal" data-mode="goal">📍 Đặt điểm giao</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-reset">↺ Đặt lại</button>
+        </div>
+        <div class="toc-do">
+            <label for="toc-do-so">Tốc độ tối đa</label>
+            <input type="range" id="toc-do-range" aria-label="Tốc độ tối đa của robot">
+            <span class="toc-do-nhap"><input type="number" id="toc-do-so" inputmode="numeric"><span class="don-vi">ô/giây</span></span>
+            <span class="toc-do-loi" aria-live="polite"></span>
+          </div>
+          <div class="legend">
+          <span><i class="i-start"></i>Xuất phát</span>
+          <span><i class="i-goal"></i>Điểm giao</span>
+          <span><i class="i-wall"></i>Vật cản</span>
+          <span><i class="i-seen"></i>Ô A* đã duyệt</span>
+          <span><i class="i-path"></i>Tuyến đường</span>
+            <span><i class="i-lan"></i>Làn ô tô</span>
+            <span><i class="i-xe"></i>Ô tô</span>
+            <span><i class="i-nguoi"></i>Người đi bộ</span>
+            <span><i class="i-non"></i>Nón / <i class="i-cay"></i>cây</span>
+        </div>
+        <div class="grid-wrap">
+          <canvas class="pf-canvas" id="pf-canvas" role="img" aria-label="Bản đồ lưới để tìm đường. Bấm hoặc kéo để vẽ vật cản."></canvas>
+        </div>
+        <div class="find-row">
+          <button class="btn btn-primary" id="btn-find" type="button">Tìm đường bằng Python (A*)</button>
+          <button class="btn btn-ghost" id="btn-3d" type="button">🧊 Xem trong 3D</button>
+        </div>
+        <div class="status busy" id="status"><span class="led"></span><span id="status-text">Đang nạp Python…</span></div>
+      </div>
+      <div class="path-out">
+        <div class="map-input">
+          <label for="map-text">Nhập bản đồ của bạn: mỗi dòng là một hàng của lưới</label>
+          <div class="keys"><span><b>0</b> = vỉa hè / đường</span><span><b>1</b> = nhà</span><span><b>S</b> = xuất phát</span><span><b>G</b> = điểm giao</span><span><b>N</b>/<b>D</b> = làn xe ngang/dọc</span><span><b>+</b> = ngã tư</span><span><b>X</b> = ô tô đỗ</span><span><b>C</b> = nón</span><span><b>T</b> = cây</span></div>
+          <textarea id="map-text" spellcheck="false" autocomplete="off" aria-describedby="map-msg"></textarea>
+          <div class="map-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-build">Tạo bản đồ</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-copy-map">Sao chép</button>
+          </div>
+          <div class="map-msg" id="map-msg">Tối đa 500×500 ô (bản đồ trên 300×300 tìm đường và dựng 3D hơi lâu). Không ghi S/G thì robot xuất phát ở góc trên-trái, điểm giao ở góc dưới-phải. Có thể cách nhau bằng dấu cách hoặc dấu phẩy.</div>
+        </div>
+        <div class="result-grid" id="results">
+          <div class="result"><div class="k">Trạng thái</div><div class="v mono" id="r-found">—</div></div>
+          <div class="result"><div class="k">Số bước đi</div><div class="v mono" id="r-steps">—</div></div>
+          <div class="result"><div class="k">Ô đã duyệt (A*)</div><div class="v mono" id="r-explored">—</div></div>
+          <div class="result"><div class="k">Thời gian tính (trong Python)</div><div class="v mono" id="r-time">—</div></div>
+          <div class="result"><div class="k">Tốc độ robot</div><div class="v mono" id="r-speed">—</div></div>
+            <div class="result"><div class="k">Thời gian robot chạy</div><div class="v mono" id="r-drive">—</div></div>
+            <div class="result" style="grid-column:1 / -1"><div class="k">Bộ máy chạy</div><div class="v mono" id="r-engine">—</div></div>
+        </div>
+        <details class="pycode">
+          <summary>Xem mã Python đang chạy</summary>
+  <pre id="py-view"></pre>
+        </details>
+        <a id="nut-lien-ket" class="btn btn-primary lien-ket" href="https://drive.google.com/file/d/1tz48dDJoXivDWWIHOKD9iHQUkSg5zdgS/view?usp=sharing" target="_blank" rel="noopener">Xem file code Python trên Google Drive →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <p class="mono">Dự án học tập — Robot giao hàng MUHAHAH và thuật toán tìm đường A* bằng Python</p>
+</footer>
+
+<!-- Cửa sổ xem 3D: robot (mô hình Blender) chạy theo tuyến A*, nhiều góc camera -->
+<div class="v3d" id="v3d" role="dialog" aria-modal="true" aria-labelledby="v3d-title" hidden>
+  <div class="v3d-panel">
+    <div class="v3d-head">
+      <h3 id="v3d-title">Robot chạy trong 3D</h3>
+      <div class="v3d-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="v3d-huc" aria-pressed="false" title="Kệ mọi vật cản trừ nhà, không nhường, tông luôn người và xe">💥 Húc <kbd>B</kbd></button>
+        <button type="button" class="btn btn-ghost btn-sm" id="v3d-replay">↺ Chạy lại <kbd>R</kbd></button>
+        <button type="button" class="btn btn-primary btn-sm" id="v3d-close">Đóng <kbd>Esc</kbd></button>
+      </div>
+    </div>
+    <div class="v3d-bar">
+      <div class="v3d-cams mode-row" id="v3d-cams" aria-label="Chọn góc camera"></div>
+      <div class="toc-do toc-do-gon">
+        <label for="v3d-toc-do-so">Tốc độ</label>
+        <input type="range" aria-label="Tốc độ tối đa của robot trong 3D">
+        <span class="toc-do-nhap"><input type="number" id="v3d-toc-do-so" inputmode="numeric"><span class="don-vi">ô/s</span></span>
+        <span class="toc-do-loi" aria-live="polite"></span>
+      </div>
+    </div>
+    <div class="v3d-canvas" id="v3d-canvas"></div>
+    <div class="v3d-foot mono"><span id="v3d-info">—</span><span id="v3d-model"></span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/brython@3.13.2/brython.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script>
+  // Mở thẳng file (file://) thì trình duyệt chặn các module JS: báo ngay cách mở đúng.
+  if(location.protocol === 'file:'){
+    document.getElementById('status').className = 'status bad';
+    document.getElementById('status-text').textContent = 'Hãy mở trang bằng chay_web.bat (mở thẳng file thì trình duyệt chặn các file .js/.py)';
+  }
+</script>
+<script type="module" src="script.js"></script>
+<script type="module" src="xem3d.js"></script>
+</body>
+</html>
