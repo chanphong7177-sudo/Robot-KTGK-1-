@@ -1,4 +1,4 @@
-# VELA D1 — Robot giao hàng tự hành
+# MUHAHAHA — Robot giao hàng tự hành
 
 Dự án học tập: website giới thiệu robot giao hàng VELA D1, kèm phần thử thuật toán tìm đường **A\*** viết bằng **Python**.
 
