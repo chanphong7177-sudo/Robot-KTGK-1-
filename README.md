@@ -1,6 +1,6 @@
 # MUHAHAHA — Robot giao hàng tự hành
 
-Dự án học tập: website giới thiệu robot giao hàng VELA D1, kèm phần thử thuật toán tìm đường **A\*** viết bằng **Python**.
+Dự án học tập: website giới thiệu robot giao hàng MUHAHAHAHA, kèm phần thử thuật toán tìm đường **A\*** viết bằng **Python**.
 
 ## Cấu trúc thư mục
 
