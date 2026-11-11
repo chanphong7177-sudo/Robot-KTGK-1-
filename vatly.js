@@ -13,11 +13,12 @@
 // Đơn vị: 1 ô lưới = 1 đơn vị độ dài, thời gian tính bằng giây.
 
 export const VAT_LY = {
-  tangToc: 14,        // ô/s²  gia tốc tối đa khi tăng tốc
-  phanh: 24,          // ô/s²  gia tốc tối đa khi phanh
-  gtNgang: 16,        // ô/s²  gia tốc ngang tối đa khi vào cua (v²/r)
+  tangToc: 40,        // ô/s²  gia tốc tối đa khi tăng tốc
+  phanh: 55,          // ô/s²  gia tốc tối đa khi phanh
+  gtNgang: 45,        // ô/s²  gia tốc ngang tối đa khi vào cua (v²/r)
   banKinh: 0.22,      // ô     nửa bề ngang robot (robot giao hàng nhỏ ~0,35 ô), để không quệt tường
-  catGoc: 0.55,       // ô     đoạn tối đa cắt vào mỗi góc khi bo cua
+  catGoc: 0.55,       // ô     đoạn cắt tối thiểu vào mỗi góc khi bo cua (luôn đi được)
+  catGocMax: 3.2,     // ô     đoạn cắt tối đa: chỗ rộng thì bo cung lớn hơn để vào cua nhanh hơn (xem lamMuotDuong)
   ds: 0.05,           // ô     bước lấy mẫu đường cong
 };
 
@@ -37,6 +38,36 @@ function nhinThay(a, b, laTuong){
   return true;
 }
 
+// Cung bo góc tại P (đi từ A0 tới P rồi tới B0) với đoạn cắt L: trả về các điểm trên cung hoặc null nếu L quá lớn
+function hinhCung(A0, P, B0, L){
+  let ix = P.x - A0.x, iy = P.y - A0.y; const li = Math.hypot(ix, iy); ix /= li; iy /= li;
+  let ox = B0.x - P.x, oy = B0.y - P.y; const lo = Math.hypot(ox, oy); ox /= lo; oy /= lo;
+  const theta = Math.acos(Math.max(-1, Math.min(1, ix * ox + iy * oy)));
+  if(theta < 1e-3) return null;
+  const r = L / Math.tan(theta / 2);
+  const Ax = P.x - ix * L, Ay = P.y - iy * L;
+  const dau = Math.sign(ix * oy - iy * ox);
+  const Cx = Ax - iy * r * dau, Cy = Ay + ix * r * dau;
+  const a0 = Math.atan2(Ay - Cy, Ax - Cx), n = Math.max(2, Math.ceil(r * theta / 0.1));
+  const kq = [];
+  for(let j = 0; j <= n; j++){ const a = a0 + dau * theta * j / n; kq.push([Cx + Math.cos(a) * r, Cy + Math.sin(a) * r]); }
+  return kq;
+}
+
+// Mỗi góc được gắn p.L = đoạn cắt lớn nhất mà cung bo góc (tính cả bề ngang robot) vẫn không quệt tường:
+// đường rộng → cung lớn → bán kính cua lớn → vào cua nhanh; hẻm hẹp → cung nhỏ như cũ.
+function gocCoTheCat(a, p, b, laTuong){
+  const li = Math.hypot(p.x - a.x, p.y - a.y), lo = Math.hypot(b.x - p.x, b.y - p.y);
+  const lMax = Math.min(VAT_LY.catGocMax, li / 2, lo / 2);
+  const rb = VAT_LY.banKinh;
+  for(let L = lMax; L > VAT_LY.catGoc; L -= 0.25){
+    const cung = hinhCung(a, p, b, L);
+    if(!cung) return VAT_LY.catGoc;
+    if(cung.every(([x, y]) => [[0, 0], [rb, 0], [-rb, 0], [0, rb], [0, -rb]].every(([dx, dy]) => !laTuong(Math.round(y + dy), Math.round(x + dx))))) return L;
+  }
+  return VAT_LY.catGoc;
+}
+
 export function lamMuotDuong(path, laTuong){
   const p = path.map(([r, c]) => ({ x: c, y: r }));
   if(p.length < 3) return p;
@@ -48,6 +79,7 @@ export function lamMuotDuong(path, laTuong){
     kq.push(p[j]);
     i = j;
   }
+  for(let k = 1; k < kq.length - 1; k++) kq[k].L = gocCoTheCat(kq[k - 1], kq[k], kq[k + 1], laTuong);
   return kq;
 }
 
@@ -76,7 +108,7 @@ export function taoDuongCong(goc){
     const cosT = Math.max(-1, Math.min(1, ix * ox + iy * oy));
     const theta = Math.acos(cosT);                 // góc phải quay
     if(theta < 1e-3){ doan(cx, cy, P.x, P.y); cx = P.x; cy = P.y; continue; }
-    const L = Math.min(catGoc, li / 2, lo / 2);
+    const L = Math.min(P.L ?? catGoc, li / 2, lo / 2);
     const r = L / Math.tan(theta / 2);
     const Ax = P.x - ix * L, Ay = P.y - iy * L, Bx = P.x + ox * L, By = P.y + oy * L;
     doan(cx, cy, Ax, Ay);
@@ -116,15 +148,13 @@ export function taoDuongCong(goc){
 }
 
 // ---------- 3) mô phỏng theo thời gian ----------
-// các thời điểm đoán trước vị trí vật cản động (dày để xe chạy nhanh băng ngang không "lọt" giữa 2 mẫu)
-const THOI_DIEM_DOAN = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2];
 export class XeRobot {
   constructor(cong){ this.congGoc = cong; this.cong = cong; this.datLai(); }
 
   datLai(){
     const c = this.cong = this.congGoc;
     Object.assign(this, { s: 0, sTruoc: 0, soLanVong: 0, v: 0, vMax: 0, aDoc: 0, aNgang: 0, t: 0, i: 0, xong: c.tong <= 0,
-      dangCho: false, soLanNhuong: 0, tgCho: 0, choLienTuc: 0, xinDuong: 0, biCham: 0,
+      dangCho: false, soLanNhuong: 0, tgCho: 0, choLienTuc: 0, choTong: 0, xinDuong: 0, tuDo: 0, biCham: 0,
       x: c.x[0], y: c.y[0], huong: c.huong[Math.min(1, c.n - 1)], k: 0 });
   }
 
@@ -145,11 +175,14 @@ export class XeRobot {
     return mang[i] + (mang[i + 1] - mang[i]) * t;
   }
 
-  // quãng đường tới chỗ đầu tiên trên tuyến bị vật cản động chiếm (Infinity nếu thông)
-  #khoangTrong(vatCan){
-    if(!vatCan || !vatCan.length) return Infinity;
-    const c = this.cong;
-    const tamNhin = this.v * this.v / (2 * VAT_LY.phanh) + 3;
+  // Quãng đường tới chỗ đầu tiên trên tuyến mà robot SẼ đụng vật cản động (Infinity nếu thông).
+  // Kiểm tra theo cả không gian lẫn thời gian: ước lượng robot tới mỗi điểm trên tuyến lúc nào (tăng tốc hết cỡ rồi giữ vCap),
+  // rồi chỉ xét chỗ vật cản đang ở quanh thời điểm đó (±0,45 s). Nhờ vậy robot nhanh băng qua làn xe khi xe còn xa,
+  // thay vì đứng chờ cho tới khi xe chạy hẳn qua (kiểu cũ: coi mọi chỗ xe có thể tới trong 1,2 s tới đều bị chiếm).
+  #khoangTrong(vatCan, vCap){
+    if(!vatCan || !vatCan.length || this.tuDo > 0) return Infinity;
+    const c = this.cong, v = this.v, a = VAT_LY.tangToc;
+    const tamNhin = v * v / (2 * VAT_LY.phanh) + 6;
     // chỉ quan tâm vật ở phía trước hoặc ngang robot; vật đã ở sau lưng thì bỏ qua (tránh kẹt nhau)
     const hx = Math.sin(this.huong), hy = Math.cos(this.huong);
     // chờ người đi bộ quá 3 s (vd. gặp nhau trong hẻm cụt): robot "xin đường", lách qua người trong 1,5 s
@@ -158,11 +191,15 @@ export class XeRobot {
                                 && (o.x - this.x) * hx + (o.y - this.y) * hy > -0.3
                                 && !(boQuaNguoi && o.r < 0.3));
     if(!gan.length) return Infinity;
+    const cap = Math.max(vCap, v, 1);
+    const dTang = Math.max(0, (cap * cap - v * v) / (2 * a));
+    const denTai = d => d <= dTang ? (Math.sqrt(v * v + 2 * a * d) - v) / a : (cap - v) / a + (d - dTang) / cap;
     for(let j = this.i; j < c.n && c.s[j] - this.s < tamNhin; j += 3){
-      const px = c.x[j], py = c.y[j];
+      const px = c.x[j], py = c.y[j], tj = denTai(Math.max(0, c.s[j] - this.s));
       for(const o of gan){
         const nguong = (VAT_LY.banKinh + o.r) ** 2;
-        for(const tau of THOI_DIEM_DOAN){
+        for(let k = -1; k <= 1; k++){
+          const tau = Math.max(0, tj + k * 0.15);
           const qx = o.x + o.vx * tau - px, qy = o.y + o.vy * tau - py;
           if(qx * qx + qy * qy < nguong) return Math.max(0, c.s[j] - this.s);
         }
@@ -174,7 +211,7 @@ export class XeRobot {
   buoc(dt, vmax, vatCan){
     if(this.xong) { this.aDoc = 0; this.aNgang = 0; this.dangCho = false; return; }
     const c = this.cong;
-    const trong = this.#khoangTrong(vatCan);
+    const trong = this.#khoangTrong(vatCan, Math.min(vmax, this.#noiSuy(c.vGioiHan) + 8));
     const vTranh = trong === Infinity ? Infinity : Math.sqrt(2 * VAT_LY.phanh * Math.max(0, trong - 0.7));
     const soBuocCon = Math.max(1, Math.ceil(dt / (1 / 240)));   // chia nhỏ dt cho ổn định
     const h = dt / soBuocCon;
@@ -207,6 +244,11 @@ export class XeRobot {
     if(cho && !this.dangCho) this.soLanNhuong++;
     if(cho) this.tgCho += dt;
     this.choLienTuc = cho ? this.choLienTuc + dt : 0;
+    // Chống kẹt vĩnh viễn (xe và robot chờ nhau, hoặc robot nằm chồng lên xe): đứng chờ quá 2 s thì "nhích lên" 1,2 s,
+    // bỏ qua mọi vật cản động để thoát ra; xong lại xét vật cản như bình thường.
+    this.choTong = cho ? this.choTong + dt : (this.v > 1 ? 0 : this.choTong);
+    this.tuDo = Math.max(0, this.tuDo - dt);
+    if(this.choTong > 2){ this.tuDo = 1.2; this.choTong = 0; }
     this.xinDuong = Math.max(0, this.xinDuong - dt);
     if(this.choLienTuc > 3){ this.xinDuong = 1.5; this.choLienTuc = 0; }
     this.dangCho = cho;

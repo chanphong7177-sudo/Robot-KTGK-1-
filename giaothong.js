@@ -198,11 +198,7 @@ export class GiaoThong {
     for(const x of this.xe) if(!x.an && !x.bay && Math.abs(x.x - cx) + Math.abs(x.y - cy) < tam)
     {
       for(const s of [-1, 1]) ds.push({ x: x.x + x.hx * lech * s, y: x.y + x.hy * lech * s, vx: x.vx, vy: x.vy, r: XE.banKinh });
-      // xe đang chạy cần một khoảng phía trước mũi xe để kịp phanh: robot không được bước vào đó
-      if(x.v > 1){
-        const truoc = lech + 0.6 + x.v * x.v / (2 * XE.phanh);
-        ds.push({ x: x.x + x.hx * truoc, y: x.y + x.hy * truoc, vx: x.vx, vy: x.vy, r: XE.banKinh, vungPhanh: true });
-      }
+      // (không còn "vùng phanh" phía trước mũi xe: ô tô tự phanh khi thấy robot trên làn, robot chỉ cần tránh đúng lúc xe tới)
     }
     for(const n of this.nguoi) if(!n.bay && Math.abs(n.x - cx) + Math.abs(n.y - cy) < tam) ds.push({ x: n.x, y: n.y, vx: n.vx, vy: n.vy, r: NGUOI.banKinh });
     return ds;
@@ -454,8 +450,26 @@ export class GiaoThong {
     }
     if(robot){
       const rx = robot.x - n.x, ry = robot.y - n.y, d = Math.hypot(rx, ry);
+      // Robot đang chạy nhanh tới từ phía sau / phía trước trên đúng đường người này đứng: bước sang ngang NGAY (nhanh gấp ~3 lần
+      // bình thường) để robot lướt qua, thay vì đứng chắn đường khiến robot phải hãm tốc đi theo sau.
+      const vr = Math.hypot(robot.vx, robot.vy);
+      if(vr > 1.5 && !(n.esq > 0)){
+        const ux = robot.vx / vr, uy = robot.vy / vr, px = -rx, py = -ry;
+        const doc = px * ux + py * uy, ngang = px * -uy + py * ux;
+        if(doc > -0.2 && doc < 6 && Math.abs(ngang) < 0.7){
+          const dau = ngang >= 0 ? 1 : -1, r = Math.round(n.y), c = Math.round(n.x);
+          for(const sg of [dau, -dau]){
+            const qx = -uy * sg, qy = ux * sg;
+            const a = Math.abs(qx) > Math.abs(qy) ? Math.sign(qx) : 0, b = Math.abs(qx) > Math.abs(qy) ? 0 : Math.sign(qy);
+            const l = this.#o(r + b, c + a);
+            if(l === O.NHA || l >= O.XE_DO) continue;
+            Object.assign(n, { hx: a, hy: b, tx: c + a, ty: r + b, dung: 0, esq: 0.6 });
+            break;
+          }
+        }
+      }
       // robot ở ngay trước mặt: khựng lại một chút rồi quay sang ô xa robot nhất (né đường)
-      if(d < 1.1 && (rx * n.hx + ry * n.hy) > 0.2){
+      if(!(n.esq > 0) && d < 1.1 && (rx * n.hx + ry * n.hy) > 0.2){
         const r = Math.round(n.y), c = Math.round(n.x);
         let tot = null, xaNhat = -1;
         for(const [a, b] of [[0, 1], [0, -1], [1, 0], [-1, 0]]){
@@ -469,6 +483,7 @@ export class GiaoThong {
         else { n.tx = c; n.ty = r; }
       }
     }
+    if(n.esq > 0) n.esq -= dt;
     const chay = n.hoang > 0;           // hoảng loạn: chạy nhanh, ưu tiên hướng ra xa chỗ nổ / tông
     if(chay){ n.hoang -= dt; n.dung = 0; }
     if(n.dung > 0){ n.dung -= dt; n.vx = n.vy = 0; return; }
@@ -499,7 +514,7 @@ export class GiaoThong {
       if(!chay && this.rng() < 0.02) n.dung = 1 + this.rng() * 2;   // thỉnh thoảng đứng lại (xem điện thoại…)
       return;
     }
-    const vv = n.v * (chay ? 2.6 : 1);
+    const vv = n.v * (chay ? 2.6 : n.esq > 0 ? 3.2 : 1);
     const buoc = Math.min(d, vv * dt);
     n.x += dx / d * buoc; n.y += dy / d * buoc;
     n.vx = dx / d * vv; n.vy = dy / d * vv;
